@@ -1,9 +1,9 @@
-#### YOUTUBE ANNOTATIONS EXTENSION
+# YOUTUBE ANNOTATIONS EXTENSION
 
 ### NOTE: 
 This project is a **prove of concept** / **sample application** for a chromium based web-browser
 
-# Embed app into chromium based web-browsers
+## Embed app into chromium based web-browsers
 
 > download this repo on your pc and extract the .zip file.
 
