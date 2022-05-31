@@ -12,7 +12,7 @@ This project is a **prove of concept** / **sample application** for a chromium b
 
 > Enable extension developer mode in your browser on: 
 >
-> chrome://extensions/
+> [chrome://extensions/](chrome://extensions/)
 
 > Now load the project as "unpacked extension":
 >
