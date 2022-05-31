@@ -1,17 +1,13 @@
-# Password Manager for Chrome
+#### YOUTUBE ANNOTATIONS EXTENSION
 
 ### NOTE: 
-This project is a **prove of concept** / **sample application** for a chromium based web-browser and originated form the youtube video: https://www.youtube.com/watch?v=bpuomoEUbgQ
-
-This extension **does not provide a secure password storage** (as of now 18th March 2022) and therefor it is not recomeded to be used for other than educational purposes.
-
+This project is a **prove of concept** / **sample application** for a chromium based web-browser
 
 # Embed app into chromium based web-browsers
-Tested Version: [Chromium v99.0.4844.74 (Official Build)]
 
-> cd "PATH TO LOCALLY SAVE PROJECT INTO"
+> download this repo on your pc and extract the .zip file.
 
-> git clone https://github.com/conaticus/chrome-password-manager-extension
+> *you can go to teh green button that say CODE and click on the last option DOWNLOAD ZIP
 
 
 > Enable extension developer mode in your browser on: 
@@ -22,12 +18,12 @@ Tested Version: [Chromium v99.0.4844.74 (Official Build)]
 >
 > Click "Load unpacked"
 >
-> Navigate and select the git cloned folder "chrome-password-manager-extension"
+> Navigate and select the folder with the files
 > 
-> Password Manager should now be displayed as an installed extension
+> YOUTUBE ANNOTATIONS should now be displayed as an installed extension
 
 > Test if the application is working by accessing e.g.:
 >
-> https://facebook.com/login
+> [https://youtube.com/watch](https://www.youtube.com/watch?v=h7MYJghRWt0)
 >
-> A window should display above the login page stating "Enter password for this page"
+> A bar should display above the title of the video
