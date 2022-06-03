@@ -1,7 +1,7 @@
 {
     "name": "Youtube Annotations",
     "description": "Annotations for youtube videos.",
-    "version": "1.0",
+    "version": "1.1",
     "manifest_version": 3,
     "permissions": ["webNavigation", "storage", "scripting", "activeTab"],
     "background": {

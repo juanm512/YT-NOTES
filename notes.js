@@ -1,69 +1,83 @@
-const video_ID = window.location.href.split("=")[1];
-function myCallbackFunction(dataStored) {
-    console.log(dataStored);
-    if (dataStored[video_ID]) {  //better with dot notation: dataStored.selected
+let contenedorVideoID = document.getElementById("video-ID");
+let video_ID = ""; 
+let video_title = ""; 
+chrome.storage.sync.get("lastVideo", res=>{
+  video_ID=res.lastVideo.video_ID;
+  video_title=res.lastVideo.title;
+  contenedorVideoID.innerText = video_title;
+  // console.log(res.lastVideo);
+  chrome.storage.sync.get(res.lastVideo.video_ID, (res)=>{
+    if (res[video_ID]) {  //better with dot notation: res.selected
 
-      let annotations = dataStored[video_ID]; 
-      console.log("Data was loaded.");
+      let annotations = res[video_ID]; 
+      // console.log("Data was loaded.");
 
-      
-      
-      
-      
-      let contenedorInfoAnnotations = document.createElement("div");
-      contenedorInfoAnnotations.id = "contenedorInfoAnnotations";
-      contenedorInfoAnnotations.style.position = "relative";
-      contenedorInfoAnnotations.style.width = "100%";
-      contenedorInfoAnnotations.style.display = "inline-block";
-      contenedorInfoAnnotations.style.paddingLeft = "8px";
-      contenedorInfoAnnotations.style.paddingRight = "8px";
-      contenedorInfoAnnotations.style.paddingTop = "8px";
-      contenedorInfoAnnotations.style.paddingBottom = "8px";
-      
-      for (let i = 0; i < annotations[video_ID].length; i++) {
-            let annotationTitle = document.createElement("h1");
-            annotationTitle.id = "annotationTitle";
-            annotationTitle.style.fontSize = "20px";
-            annotationTitle.style.fontWeight = "bold";
-            annotationTitle.style.color = "white";
-            annotationTitle.style.margin = "0px";
-            annotationTitle.style.padding = "0px";
-            annotationTitle.style.textAlign = "left";
-            annotationTitle.style.display = "none";
-            annotationTitle.innerText = annotations[video_ID][i].title;
-        
-            let annotationDescription = document.createElement("p");
-            annotationDescription.id = "annotationDescription";
-            annotationDescription.style.fontSize = "14px";
-            annotationDescription.style.color = "white";
-            annotationDescription.style.margin = "0px";
-            annotationDescription.style.padding = "0px";
-            annotationDescription.style.textAlign = "left";
-            annotationDescription.style.display = "none";
-            annotationDescription.innerText = annotations[video_ID][i].description;
+      annotations.sort((a, b)=>{
+        return a.time - b.time;
+      }
+      );
 
-            let annotationTime = document.createElement("p");
-            annotationTime.id = "annotationTime";
-            annotationTime.style.fontSize = "14px";
-            annotationTime.style.color = "white";
-            annotationTime.style.margin = "0px";
-            annotationTime.style.padding = "0px";
-            annotationTime.style.textAlign = "left";
-            annotationTime.style.display = "none";
-            annotationTime.innerText = annotations[video_ID][i].time;
+        for (let i = 0; i < annotations.length; i++) {
+          let li = document.createElement("li");
+          li.style.borderLeft = "2px solid #"+annotations[i].color;
+          // li.style.height = 20+"px";
+          li.style.padding = 2.5+"px";
+          li.style.marginTop = 2.5+"px";
 
-        contenedorInfoAnnotations.appendChild(annotationTitle);
-        contenedorInfoAnnotations.appendChild(annotationDescription);
-        contenedorInfoAnnotations.appendChild(annotationTime);
+            let link = document.createElement("a");
+            link.href = "https://www.youtube.com/watch?v="+video_ID+"&t="+annotations[i].time+"s";
+            link.target = "_blank";
+            
+            link.addEventListener("mouseover", ()=>{
+              li.style.backgroundColor = "#"+annotations[i].color+"33";
+            }
+            );
 
-    }
-
-    document.body.appendChild(contenedorInfoAnnotations);
+            link.addEventListener("mouseout", ()=>{
+              li.style.backgroundColor = "transparent";
+            }
+            );
 
 
+              let annotationTitle = document.createElement("h1");
+              annotationTitle.id = "annotationTitle";
+              annotationTitle.style.fontSize = "20px";
+              annotationTitle.style.fontWeight = "bold";
+              annotationTitle.style.color = "white";
+              annotationTitle.style.margin = "0px";
+              annotationTitle.style.padding = "0px";
+              annotationTitle.style.textAlign = "left";
+              annotationTitle.innerText = annotations[i].title;
+          
+              let annotationDescription = document.createElement("p");
+              annotationDescription.id = "annotationDescription";
+              annotationDescription.style.fontSize = "14px";
+              annotationDescription.style.color = "white";
+              annotationDescription.style.margin = "0px";
+              annotationDescription.style.padding = "0px";
+              annotationDescription.style.textAlign = "left";
+              annotationDescription.innerText = annotations[i].description;
+
+              let annotationTime = document.createElement("p");
+              annotationTime.id = "annotationTime";
+              annotationTime.style.fontSize = "14px";
+              annotationTime.style.color = "white";
+              annotationTime.style.margin = "0px";
+              annotationTime.style.padding = "0px";
+              annotationTime.style.textAlign = "left";
+              annotationTime.innerText = ( (annotations[i].time/60 < 1) ? "00" : parseInt(annotations[i].time/60)) + " min" + ":" + annotations[i].time%60 + " sec";
+
+            link.appendChild(annotationTitle);
+            link.appendChild(annotationDescription);
+            link.appendChild(annotationTime);
+
+          li.appendChild(link);
+
+          document.getElementById("ul-notes").appendChild(li);
+
+        }
 
     }
   }
-  
-function getValue(callback) { chrome.storage.sync.get([video_ID], callback); }
-getValue(myCallbackFunction);
+  );
+});

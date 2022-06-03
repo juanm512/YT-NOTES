@@ -1,4 +1,4 @@
-chrome.webNavigation["onCompleted"].addListener(function(o) {
+chrome.webNavigation["onDOMContentLoaded"].addListener(function(o) {
         // console.log("onCompleted2");
         // console.log(o);
         if (o.url.includes("watch?v=")) {
@@ -18,31 +18,44 @@ chrome.webNavigation["onCompleted"].addListener(function(o) {
         pathPrefix: '/watch',
     }]
 });
-  
-function run(){
-    const myInterval = setInterval(myTimer, 1000);
 
+function run(){
+    const myInterval = setInterval(myTimer, 400);
     function myTimer() {
-        if(document.getElementById("primary-inner")){
+        if(document.getElementById("primary-inner") 
+        && document.readyState === "complete"
+        && document.querySelector("#container > h1 > yt-formatted-string")
+        && document.querySelector("#movie_player > div.ytp-chrome-bottom > div.ytp-progress-bar-container > div.ytp-progress-bar")
+        && document.querySelector("#movie_player > div.ytp-chrome-bottom > div.ytp-chrome-controls > div.ytp-right-controls")
+        ){
             clearInterval(myInterval);
             newPageLoad();
         }
-        // console.log("waiting for page to load");
+        // console.log("waiting for page to load",document.readyState);
     }
+
+
+
     let videoData = {
         video_ID: "",
         duration: 0
     }
+
     const newPageLoad = async () => {
         let video_ID = document.URL.split("watch?v=")[1];
         if(video_ID.includes("&")){
             video_ID = video_ID.split("&")[0];
         }
-        // console.log(video_ID);
+        chrome.storage.sync.set({
+            "lastVideo": {
+                video_ID: video_ID, 
+                title: document.querySelector("#container > h1 > yt-formatted-string").innerText
+            }
+        });
 
         videoData.video_ID = video_ID;
         videoData.duration = document.querySelector("#movie_player > div.ytp-chrome-bottom > div.ytp-progress-bar-container > div.ytp-progress-bar").ariaValueMax;
-    // console.log(videoData);
+
 
 
         let contenedorDeTodo = document.createElement("div");
@@ -322,7 +335,7 @@ function run(){
         
         
         //obtener anotaciones de este video en particular
-        let annotations = await chrome.storage.local.get([video_ID]);
+        let annotations = await chrome.storage.sync.get([video_ID]);
         // console.log(annotations);
         
         if ( annotations && annotations[video_ID] && annotations[video_ID].length > 0 ) {
@@ -429,7 +442,7 @@ function run(){
 
     const annotationSaver = async (title, description, time) => {
         const video_ID = window.location.href.split("=")[1];
-        let annotations = await chrome.storage.local.get([video_ID]);
+        let annotations = await chrome.storage.sync.get([video_ID]);
         // console.log(annotations);
         const annotation_ID = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
         const color = Math.floor(Math.random()*16777215).toString(16);
@@ -441,7 +454,7 @@ function run(){
                 annotation_ID,
                 color
             });
-            chrome.storage.local.set({
+            chrome.storage.sync.set({
                 [video_ID]: annotations[video_ID]
             });
             annotationRender({
@@ -452,7 +465,7 @@ function run(){
                 color
             });
         } else {
-            chrome.storage.local.set({
+            chrome.storage.sync.set({
                 [video_ID]: [{
                     title,
                     description,
@@ -480,7 +493,7 @@ function run(){
         let annotation_ID = document.getElementById("inputAnnotationID").value;
 
         const video_ID = window.location.href.split("=")[1];
-        let annotations = await chrome.storage.local.get([video_ID]);
+        let annotations = await chrome.storage.sync.get([video_ID]);
         // console.log(annotations);
         if ( annotations && annotations[video_ID] && annotations[video_ID].length > 0 ) {
             //update annotation in storage
@@ -492,7 +505,7 @@ function run(){
                 }
             }
             );
-            chrome.storage.local.set({
+            chrome.storage.sync.set({
                 [video_ID]: annotations[video_ID]
             });
             //update annotation in DOM
@@ -511,12 +524,12 @@ function run(){
         let annotation_ID = document.getElementById("inputAnnotationID").value;
 
         const video_ID = window.location.href.split("=")[1];
-        let annotations = await chrome.storage.local.get([video_ID]);
+        let annotations = await chrome.storage.sync.get([video_ID]);
         // console.log(annotations);
         if ( annotations && annotations[video_ID] && annotations[video_ID].length > 0 ) {
             const index = annotations[video_ID].findIndex(annotation => annotation.annotation_ID === annotation_ID );
             annotations[video_ID].splice(index, 1);
-            chrome.storage.local.set({
+            chrome.storage.sync.set({
                 [video_ID]: annotations[video_ID]
             });
             const element = document.getElementById(annotation_ID);
@@ -568,7 +581,7 @@ function run(){
                     document.getElementById("annotationDescription").style.display = "block";
                     document.getElementById("annotationDescription").innerText = document.getElementById(data.annotation_ID).dataset.description;
                     document.getElementById("annotationTime").style.display = "block";
-                    document.getElementById("annotationTime").innerText = document.getElementById(data.annotation_ID).dataset.time;
+                    document.getElementById("annotationTime").innerText = ( (document.getElementById(data.annotation_ID).dataset.time/60 < 1) ? "00" : parseInt(document.getElementById(data.annotation_ID).dataset.time/60)) + " min" + ":" + document.getElementById(data.annotation_ID).dataset.time%60 + " sec";
                 });
 
                 marcador.addEventListener("mouseout", () => {
